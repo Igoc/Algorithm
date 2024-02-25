@@ -1,18 +1,24 @@
 import java.io.*;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.PriorityQueue;
+import java.util.StringTokenizer;
 
-class Jewel implements Comparable<Jewel> {
-    public int weight;
+class Jewellery {
+    public int mass;
     public int value;
 
-    public Jewel(int weight, int value) {
-        this.weight = weight;
+    public Jewellery(int mass, int value) {
+        this.mass = mass;
         this.value = value;
     }
 
-    @Override
-    public int compareTo(Jewel o) {
-        return value - o.value;
+    public int getMass() {
+        return mass;
+    }
+
+    public int getValue() {
+        return value;
     }
 }
 
@@ -26,7 +32,7 @@ public class Main {
         int N = Integer.parseInt(tokenizer.nextToken());
         int K = Integer.parseInt(tokenizer.nextToken());
 
-        List<Jewel> jewels = new ArrayList<>();
+        Jewellery[] jewelleries = new Jewellery[N];
 
         for (int index = 0; index < N; index++) {
             tokenizer = new StringTokenizer(in.readLine());
@@ -34,29 +40,26 @@ public class Main {
             int M = Integer.parseInt(tokenizer.nextToken());
             int V = Integer.parseInt(tokenizer.nextToken());
 
-            jewels.add(new Jewel(M, V));
+            jewelleries[index] = new Jewellery(M, V);
         }
 
-        jewels.sort(Comparator.comparingInt(o -> o.weight));
+        Arrays.sort(jewelleries, Comparator.comparingInt(Jewellery::getMass));
 
-        List<Integer> bags = new ArrayList<>();
+        int[] bags = new int[K];
 
         for (int index = 0; index < K; index++) {
-            int C = Integer.parseInt(in.readLine());
-
-            bags.add(C);
+            bags[index] = Integer.parseInt(in.readLine());
         }
 
-        bags.sort(Comparator.naturalOrder());
+        Arrays.sort(bags);
 
-        PriorityQueue<Jewel> priorityQueue = new PriorityQueue<>(Comparator.reverseOrder());
-        int jewelIndex = 0;
-        long output = 0;
+        PriorityQueue<Jewellery> priorityQueue = new PriorityQueue<>(Comparator.comparingInt(Jewellery::getValue).reversed());
+        int jewelleryIndex = 0;
+        long output = 0L;
 
-        for (int bagIndex = 0; bagIndex < K; bagIndex++) {
-            while (jewelIndex < N && jewels.get(jewelIndex).weight <= bags.get(bagIndex)) {
-                priorityQueue.add(jewels.get(jewelIndex));
-                jewelIndex++;
+        for (int bag : bags) {
+            while (jewelleryIndex < N && jewelleries[jewelleryIndex].mass <= bag) {
+                priorityQueue.offer(jewelleries[jewelleryIndex++]);
             }
 
             if (!priorityQueue.isEmpty()) {
