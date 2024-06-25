@@ -47,6 +47,7 @@ public class Main {
 
         priorityQueue.offer(new Path(0, 0L));
         Arrays.fill(times, Long.MAX_VALUE);
+        times[0] = 0L;
 
         while (!priorityQueue.isEmpty()) {
             Path path = priorityQueue.poll();
