@@ -1,23 +1,6 @@
 import java.io.*;
 import java.util.*;
 
-class Student implements Comparable<Student> {
-    public int number;
-    public int depth;
-    public List<Student> tallerStudents;
-
-    public Student(int number) {
-        this.number = number;
-        this.depth = 0;
-        this.tallerStudents = new ArrayList<>();
-    }
-
-    @Override
-    public int compareTo(Student o) {
-        return Integer.compare(depth, o.depth);
-    }
-}
-
 public class Main {
     static BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
     static BufferedWriter out = new BufferedWriter(new OutputStreamWriter(System.out));
@@ -28,10 +11,11 @@ public class Main {
         int N = Integer.parseInt(tokenizer.nextToken());
         int M = Integer.parseInt(tokenizer.nextToken());
 
-        Student[] students = new Student[N];
+        List<List<Integer>> tallerStudents = new ArrayList<>();
+        int[] shorterStudentNumbers = new int[N];
 
-        for (int index = 0; index < N; index++) {
-            students[index] = new Student(index + 1);
+        for (int student = 0; student < N; student++) {
+            tallerStudents.add(new ArrayList<>());
         }
 
         for (int index = 0; index < M; index++) {
@@ -40,29 +24,32 @@ public class Main {
             int A = Integer.parseInt(tokenizer.nextToken()) - 1;
             int B = Integer.parseInt(tokenizer.nextToken()) - 1;
 
-            students[A].tallerStudents.add(students[B]);
+            tallerStudents.get(A).add(B);
+            shorterStudentNumbers[B]++;
+        }
 
-            Queue<Student> queue = new LinkedList<>();
+        Deque<Integer> deque = new ArrayDeque<>();
 
-            students[B].depth = Math.max(students[B].depth, students[A].depth + 1);
-            queue.offer(students[B]);
-
-            while (!queue.isEmpty()) {
-                Student student = queue.poll();
-
-                for (Student tallerStudent : student.tallerStudents) {
-                    if (tallerStudent.depth < student.depth + 1) {
-                        tallerStudent.depth = student.depth + 1;
-                        queue.offer(tallerStudent);
-                    }
-                }
+        for (int student = 0; student < N; student++) {
+            if (shorterStudentNumbers[student] == 0) {
+                shorterStudentNumbers[student] = -1;
+                deque.offer(student);
             }
         }
 
-        Arrays.sort(students);
+        while (!deque.isEmpty()) {
+            int student = deque.poll();
 
-        for (Student student : students) {
-            out.write(student.number + " ");
+            for (int tallerStudent : tallerStudents.get(student)) {
+                shorterStudentNumbers[tallerStudent]--;
+
+                if (shorterStudentNumbers[tallerStudent] == 0) {
+                    shorterStudentNumbers[tallerStudent] = -1;
+                    deque.offer(tallerStudent);
+                }
+            }
+
+            out.write((student + 1) + " ");
         }
 
         in.close();
